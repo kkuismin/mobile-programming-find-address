@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, TextInput, View, Button, Alert } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import * as Location from 'expo-location';
 import { API_KEY } from '@env';
 
 
@@ -10,6 +11,19 @@ export default function App() {
   const [address, setAddress] = useState('');
   const [lat, setLat] = useState(60.170839);
   const [lng, setLng] = useState(24.941411);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('No permission to get location');
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      setLat(location.coords.latitude);
+      setLng(location.coords.longitude);
+    })();
+  }, []);
 
   const fetchAddress = async () => {
 
